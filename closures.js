@@ -149,7 +149,7 @@ function motivation(firstname, lastname) {
 
   // code message function here.
   function message(){
-    return welcomeText + firstname + " " + lastname;
+    return welcomeText + firstname + " " + lastname + ".";
   }
 
   //Uncommment this to return the value of your invoked message function
@@ -191,12 +191,14 @@ var module = (function() {
   // Anything that is being returned is made public and can be invoked from
   // outside our lexical scope
   return {
-    // Code here.
+    publicMethod: function(){
+      return privateMethod();
+    }
   };
 
 })();
 
-
+module.publicMethod();
 
 /******************************************************************************\
  #PROBLEM-07
@@ -212,11 +214,19 @@ var allUsers = ["Tom", "Dick", "Harry", "Anne", "Quinton", "Katie", "Mary"];
 
 function findPotentialFriends(existingFriends) {
 
+  return function(user){
+    if (existingFriends.includes(user)){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
 }
 
 var isNotAFriend = findPotentialFriends( friends );
-// isNotAFriend(allUsers[0]); // false
-// isNotAFriend(secondLevelFriends[2]); // true
+  isNotAFriend(allUsers[0]); // false
+  isNotAFriend(secondLevelFriends[2]); // true
 
 
 /******************************************************************************\
@@ -226,8 +236,8 @@ var isNotAFriend = findPotentialFriends( friends );
 method, find all potential second level friends as well as potential friends
 from allUsers. */
 
-var potentialSecondLevelFriends = "?";
-var allPotentialFriends = "?";
+ var potentialSecondLevelFriends = allUsers.filter(isNotAFriend(secondLevelFriends));
+ var allPotentialFriends = allUsers.filter(isNotAFriend(allUsers));
 
 
 /******************************************************************************\
@@ -250,11 +260,15 @@ to 5. What we need to do is console.log(i) so that it logs like so:
  Fix the code below to log the desired output.
  */
 
+var closure = function(i){
+  return function(){
+    console.log(i);
+  }
+}
+
 function timeOutCounter() {
   for (var i = 0; i <= 5; i++) {
-    setTimeout(function() {
-    	console.log(i)
-	}, i * 1000)
+    setTimeout(closure(i), i * 1000)
   }
 }
 timeOutCounter();
