@@ -208,10 +208,20 @@ module.publicMethod();
 friends (friends of friends), and an array of all users. These arrays may share
 users. Write a function that takes in our existing friends and returns
 a function that will tell us if a given user is not already a friend. */
+
+//We are given three arrays. One has current friends, one has friends of friends, and one has 'all users',
+//or everyone 
 var friends = ["Tom", "Dick", "Harry"];
 var secondLevelFriends = ["Anne", "Harry", "Quinton"];
 var allUsers = ["Tom", "Dick", "Harry", "Anne", "Quinton", "Katie", "Mary"];
 
+//We have a function that takes in an array, then returns a closure function
+//When invoked, the closure function takes in a user. It checks if that user
+//is included in the parent's array that was passed in as an argument. If so,
+//it returns false since that person is already your friend. (The purpose of
+//the function is to tell if they are a 'potential friend', meaning if they
+//are already your friend, it should return false. If not, then it returns 
+//true since they ARE a potential friend.)  
 function findPotentialFriends(existingFriends) {
 
   return function(user){
@@ -224,7 +234,17 @@ function findPotentialFriends(existingFriends) {
 
 }
 
+//Since the function checks if they are NOT a friend, that is what we name 
+//the variable.  We invoke the outer functione, pass in an array of our
+//current friends, and save the result to 'isNotAFriend'.
 var isNotAFriend = findPotentialFriends( friends );
+
+//Now we can invoke the inner function, pass in a user, and see if they are a 
+//potential friend. We pass in users from the other arrays by selecting their
+//index. allUsers[0] = 'Tom'.  It checks if Tom is inclulded in our array of
+//friends, and since he is, it returns false (meaning that he isn't a potential
+//friend, because he is ALREADY our friend).  secondLevelFriends[2] is Quinton,
+//who is not yet a friend, so that returns true.
   isNotAFriend(allUsers[0]); // false
   isNotAFriend(secondLevelFriends[2]); // true
 
@@ -236,8 +256,24 @@ var isNotAFriend = findPotentialFriends( friends );
 method, find all potential second level friends as well as potential friends
 from allUsers. */
 
- var potentialSecondLevelFriends = allUsers.filter(isNotAFriend(secondLevelFriends));
- var allPotentialFriends = allUsers.filter(isNotAFriend(allUsers));
+// the .filter() method takes an original array, only keeps the values that return
+// true, then saves it to a new variable.  The cool part, is that we can pick how 
+// we want it to evaluate each option in the array. so we can create any function 
+// that we want, that searches any criteria we want, and then say arr.filter(func).  
+// It will pass each item from the array through the filter, pass it into the 'func'
+// function, and only keep it around if that 'func' function returns true on that value.
+// so we create any variable name we want (i.e. potentialSecondLevelFriends & 
+// allPotentialFriends), then we use the filter. So to find potential second level
+// friends, we can filter the second level users array to see who is already in our
+// 'friends' array. If they are already there, we return false, since they are already
+// a friend. If not, we return true, since they are a potential friend. Luckily, we already 
+// created that function above (isNotAFriend).  So we select the array secondlevelfriends,
+// use the filter on it, and use the function 'isnotafriend'.  that will pass each value
+// from the array in individually for evaluation, and only keep the ones that AREN'T in our
+// friends array yet.  Then we do the same thing for the 'allUsers' array. check which values
+// in that array are NOT yet in our friends array, and return those as 'allPotentialFriends'.
+ var potentialSecondLevelFriends = secondLevelFriends.filter(isNotAFriend);
+ var allPotentialFriends = allUsers.filter(isNotAFriend);
 
 
 /******************************************************************************\
@@ -259,6 +295,30 @@ to 5. What we need to do is console.log(i) so that it logs like so:
 
  Fix the code below to log the desired output.
  */
+
+//Here is what the original code looked like:
+// function timeOutCounter() {
+//   for (var i = 0; i <= 5; i++) {
+//     setTimeout(function(){console.log(i)}, i * 1000)
+//   }
+// }
+// timeOutCounter();
+
+/*
+The problem with that, is that the setTimeout is putting the function aside for a second or two,
+and then running it. By the time the function runs, the for loop has already finished looping, and
+'i' is the value 6.  so when the function goes to execute, it looks for 'i', sees 6, and logs that.
+Since the function is called 6 times, there is a queue of 6 functions that are all going to log 'i'.
+They all see that 'i' = 6, and they all log 6, so you get 6, 6 times, instead of 0, 1, 2, 3, 4, 5.
+You could remove the function part from console.log, and just have setTimeout(console.log(i), i * 1000),
+but then the setTimeout doesn't work, and i gets logged right away. Since it is logging it right away, it
+logs correct, 0, 1, 2, 3, 4, 5, but doesn't wait like you want it to. Instead of this, you can use a 
+closure. Instead of just have an anonymous function inside of setTimout, you can say closure(i), and 
+then create a closure function on your own that returns an inner function that logs 'i'.  This means
+that instead of looking back to the for loop for the value of 'i', each function will look back to its
+own snapshot of what 'i' was at the time the snapshot was created, and use that for i instead. this
+results in the timeout working properly, and 'i' loggin correctly: 0, 1, 2, 3, 4, 5
+*/
 
 var closure = function(i){
   return function(){
